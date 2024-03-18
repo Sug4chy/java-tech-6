@@ -1,13 +1,12 @@
-package ru.sug4chy.demo6.model;
+package ru.sug4chy.demo6.dto;
 
-public class User {
+public class UserDto {
 
-    private long id;
-    private String login;
-    private String password;
-    private String email;
+    private final String login;
+    private final String password;
+    private final String email;
 
-    public User(long id, String login, String password, String email) {
+    public UserDto(String login, String password, String email) {
         this.login = login;
         this.password = password;
         this.email = email;

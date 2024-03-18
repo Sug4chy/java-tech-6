@@ -1,20 +1,21 @@
 package ru.sug4chy.demo6.service;
 
-import ru.sug4chy.demo6.model.User;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import ru.sug4chy.demo6.dto.UserDto;
+import ru.sug4chy.demo6.repository.UserRepository;
 public class AuthService {
-    private static final Map<String, User> loginToProfile = new HashMap<>() {{
-        put("12", new User("12", "1234", "123"));
-    }};
 
-    public void addNewUser(User user) {
-        loginToProfile.put(user.getLogin(), user);
+    private final UserRepository userRepository;
+
+    public AuthService() {
+        this.userRepository = new UserRepository();
     }
 
-    public User getUserByLogin(String login) {
-        return loginToProfile.get(login);
+    public void addNewUser(UserDto user) {
+        //loginToProfile.put(user.getLogin(), user);
+    }
+
+    public UserDto getUserByLogin(String login) {
+        var user = userRepository.getUserByLogin(login);
+        return new UserDto(user.getLogin(), user.getPassword(), user.getEmail());
     }
 }

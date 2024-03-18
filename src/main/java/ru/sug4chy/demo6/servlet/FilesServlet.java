@@ -20,8 +20,7 @@ public class FilesServlet extends HttpServlet {
         String login = (String) request.getSession().getAttribute("login");
         String password = (String) request.getSession().getAttribute("password");
         if (login == null || password == null) {
-            String url = request.getRequestURL().toString();
-            response.sendRedirect( url.substring(0, url.lastIndexOf("/")) + "/login");
+            response.sendRedirect( "/login");
             return;
         }
 
