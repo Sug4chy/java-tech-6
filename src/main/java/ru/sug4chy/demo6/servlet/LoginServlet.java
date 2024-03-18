@@ -14,12 +14,14 @@ public class LoginServlet extends HttpServlet {
 
     private final AuthService authService = new AuthService();
 
+    //Метод для получения страницы
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.getRequestDispatcher("login.jsp").forward(req, resp);
     }
 
+    //Login метод
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
@@ -29,6 +31,7 @@ public class LoginServlet extends HttpServlet {
             resp.setContentType("text/json;charset=utf8");
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().println("Введите логин и пароль");
+            return;
         }
 
         var user = authService.getUserByLogin(login);
@@ -36,6 +39,7 @@ public class LoginServlet extends HttpServlet {
             resp.setContentType("text/json;charset=utf8");
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             resp.getWriter().println("Логин или пароль введены неверно");
+            return;
         }
 
         req.getSession().setAttribute("login", login);

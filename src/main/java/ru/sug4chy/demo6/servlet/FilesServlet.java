@@ -13,6 +13,7 @@ public class FilesServlet extends HttpServlet {
 
     private final FileService fileService = new FileService();
 
+    //Метод получения страницы с файлами
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
@@ -46,6 +47,7 @@ public class FilesServlet extends HttpServlet {
         dispatcher.forward(request, response);
     }
 
+    //Logout метод
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {

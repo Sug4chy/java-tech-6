@@ -19,12 +19,14 @@ public class RegisterServlet extends HttpServlet {
     private final AuthService authService = new AuthService();
     private final FileService fileService = new FileService();
 
+    //Метод для получения страницы
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.getRequestDispatcher("register.jsp").forward(req, resp);
     }
 
+    //Метод регистрации
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {

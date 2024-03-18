@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 @WebServlet("/download")
 public class DownloadServlet extends HttpServlet {
 
+
+    //Метод для скачивания файла
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
