@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import ru.sug4chy.demo6.dto.UserDto;
-import ru.sug4chy.demo6.service.AuthService;
 import ru.sug4chy.demo6.service.FileService;
+import ru.sug4chy.demo6.service.UserService;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import static ru.sug4chy.demo6.service.FileService.usersHomeDirectoriesPath;
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
 
-    private final AuthService authService = new AuthService();
+    private final UserService userService = new UserService();
     private final FileService fileService = new FileService();
 
     //Метод для получения страницы
@@ -42,14 +42,14 @@ public class RegisterServlet extends HttpServlet {
         }
 
         var user = new UserDto(login, password, email);
-        if (authService.getUserByLogin(login) != null) {
+        if (userService.getUserByLogin(login) != null) {
             resp.setContentType("text/html;charset=utf-8");
             resp.setStatus(HttpServletResponse.SC_CONFLICT);
             resp.getWriter().println("Пользователь с таким логином уже существует");
             return;
         }
 
-        authService.addNewUser(user);
+        userService.addNewUser(user);
         req.getSession().setAttribute("login", login);
         req.getSession().setAttribute("password", password);
 

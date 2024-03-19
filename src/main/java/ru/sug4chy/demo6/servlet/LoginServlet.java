@@ -5,14 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.sug4chy.demo6.service.AuthService;
+import ru.sug4chy.demo6.service.UserService;
 
 import java.io.IOException;
 
 @WebServlet("/")
 public class LoginServlet extends HttpServlet {
 
-    private final AuthService authService = new AuthService();
+    private final UserService userService = new UserService();
 
     //Метод для получения страницы
     @Override
@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        var user = authService.getUserByLogin(login);
+        var user = userService.getUserByLogin(login);
         if (user == null || !user.getPassword().equals(password)) {
             resp.setContentType("text/json;charset=utf8");
             resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
