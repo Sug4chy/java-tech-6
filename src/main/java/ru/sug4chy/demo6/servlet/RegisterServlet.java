@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ru.sug4chy.demo6.dto.UserDto;
+import ru.sug4chy.demo6.model.User;
 import ru.sug4chy.demo6.service.FileService;
 import ru.sug4chy.demo6.service.UserService;
 
@@ -41,7 +41,7 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        var user = new UserDto(login, password, email);
+        var user = new User(login, password, email);
         if (userService.getUserByLogin(login) != null) {
             resp.setContentType("text/html;charset=utf-8");
             resp.setStatus(HttpServletResponse.SC_CONFLICT);

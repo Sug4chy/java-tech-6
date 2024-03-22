@@ -1,6 +1,5 @@
 package ru.sug4chy.demo6.repository;
 
-import ru.sug4chy.demo6.dto.UserDto;
 import ru.sug4chy.demo6.model.User;
 
 import java.io.Closeable;
@@ -61,10 +60,9 @@ public class UserRepository implements Closeable {
             }
 
             return new User(
-                    result.getLong(1),
-                    result.getString(2),
-                    result.getString(3),
-                    result.getString(4)
+                    result.getString("login"),
+                    result.getString("password"),
+                    result.getString("email")
             );
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -72,7 +70,7 @@ public class UserRepository implements Closeable {
         return null;
     }
 
-    public void addUser(UserDto user) {
+    public void addUser(User user) {
         executeUpdate("insert into users(login, password, email) values ('" + user.getLogin()
         + "', '" + user.getPassword() + "', '" + user.getEmail() + "')");
     }
