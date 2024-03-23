@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class UserRepository {
@@ -39,8 +40,7 @@ public class UserRepository {
 
     private <T> T executeQuery(String query, ResultHandler<T> handler) {
         checkConnection();
-        try {
-            var statement = connection.createStatement();
+        try (Statement statement = connection.createStatement()) {
             var result = statement.executeQuery(query);
             if (!result.next()) {
                 return null;
@@ -55,8 +55,7 @@ public class UserRepository {
 
     private void executeUpdate(String query) {
         checkConnection();
-        try {
-            var statement = connection.createStatement();
+        try (var statement = connection.createStatement()) {
             statement.executeUpdate(query);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
