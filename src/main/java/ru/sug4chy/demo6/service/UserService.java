@@ -5,23 +5,21 @@ import ru.sug4chy.demo6.repository.UserRepository;
 
 public class UserService {
 
+    private final UserRepository userRepository;
+
     public UserService() {
+        this.userRepository = new UserRepository();
     }
 
     public void addNewUser(User user) {
         if (user == null) {
             return;
         }
-        try (var userRepository = new UserRepository()) {
-            userRepository.addUser(user);
-        }
+        userRepository.addUser(user);
+
     }
 
     public User getUserByLogin(String login) {
-        User user;
-        try (var userRepository = new UserRepository()) {
-            user = userRepository.getUserByLogin(login);
-        }
-        return user;
+        return userRepository.getUserByLogin(login);
     }
 }

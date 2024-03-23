@@ -2,49 +2,60 @@ package ru.sug4chy.demo6.repository;
 
 import ru.sug4chy.demo6.model.User;
 
-import java.io.Closeable;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class UserRepository implements Closeable {
-
-    protected final Connection connection;
-
-    public UserRepository() {
-        this.connection = getPostgresqlConnection();
-    }
+public class UserRepository {
 
     private static Connection getPostgresqlConnection() {
         try {
             Class.forName("org.postgresql.Driver");
-            String url = "jdbc:postgresql://localhost:5432/java_db";
-            var authProperties = new Properties();
-            authProperties.put("user", "postgres");
-            authProperties.put("password", "postGet5243");
+            var dbProperties = new Properties();
+            try (var in = Files.newInputStream(Paths.get("D:\\JetBrains\\IdeaProjects\\demo6\\src\\main\\resources\\database.properties"))) {
+                dbProperties.load(in);
+            }
 
-            return DriverManager.getConnection(url, authProperties);
-        } catch (ClassNotFoundException | SQLException e) {
+            String url = dbProperties.getProperty("url");
+            String user = dbProperties.getProperty("user");
+            String password = dbProperties.getProperty("password");
+            return DriverManager.getConnection(url, user, password);
+        } catch (ClassNotFoundException | SQLException | IOException e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
 
-    private ResultSet executeQuery(String query) {
-        ResultSet result = null;
-        try {
+    private <T> T executeQuery(String query, ResultHandler<T> handler) {
+        try (var connection = getPostgresqlConnection()) {
+            if (connection == null) {
+                return null;
+            }
+
             var statement = connection.createStatement();
-            result = statement.executeQuery(query);
+            var result = statement.executeQuery(query);
+            if (!result.next()) {
+                return null;
+            }
+
+            return handler.handle(result);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return result;
+
+        return null;
     }
 
     private void executeUpdate(String query) {
-        try {
+        try (var connection = getPostgresqlConnection()) {
+            if (connection == null) {
+                return;
+            }
+
             var statement = connection.createStatement();
             statement.executeUpdate(query);
         } catch (SQLException e) {
@@ -53,36 +64,16 @@ public class UserRepository implements Closeable {
     }
 
     public User getUserByLogin(String login) {
-        try {
-            var result = executeQuery("select * from users u where u.login = '" + login + "'");
-            if (!result.next()) {
-                return null;
-            }
-
-            return new User(
-                    result.getString("login"),
-                    result.getString("password"),
-                    result.getString("email")
-            );
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+        return executeQuery("select * from users u where u.login = '" + login + "'",
+                set -> new User(
+                        set.getString("login"),
+                        set.getString("password"),
+                        set.getString("email")
+                ));
     }
 
     public void addUser(User user) {
         executeUpdate("insert into users(login, password, email) values ('" + user.getLogin()
-        + "', '" + user.getPassword() + "', '" + user.getEmail() + "')");
-    }
-
-    @Override
-    public void close() {
-        try {
-            if (connection != null) {
-                connection.close();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+                + "', '" + user.getPassword() + "', '" + user.getEmail() + "')");
     }
 }
