@@ -12,7 +12,9 @@ import java.util.Properties;
 
 public class UserRepository {
 
-    private static Connection getPostgresqlConnection() {
+    private static Connection connection;
+
+    private static void createPostgresqlConnection() {
         try {
             Class.forName("org.postgresql.Driver");
             var dbProperties = new Properties();
@@ -23,19 +25,21 @@ public class UserRepository {
             String url = dbProperties.getProperty("url");
             String user = dbProperties.getProperty("user");
             String password = dbProperties.getProperty("password");
-            return DriverManager.getConnection(url, user, password);
+            connection = DriverManager.getConnection(url, user, password);
         } catch (ClassNotFoundException | SQLException | IOException e) {
             System.out.println(e.getMessage());
-            return null;
+        }
+    }
+
+    private static void checkConnection() {
+        if (connection == null) {
+            createPostgresqlConnection();
         }
     }
 
     private <T> T executeQuery(String query, ResultHandler<T> handler) {
-        try (var connection = getPostgresqlConnection()) {
-            if (connection == null) {
-                return null;
-            }
-
+        checkConnection();
+        try {
             var statement = connection.createStatement();
             var result = statement.executeQuery(query);
             if (!result.next()) {
@@ -46,16 +50,12 @@ public class UserRepository {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-
         return null;
     }
 
     private void executeUpdate(String query) {
-        try (var connection = getPostgresqlConnection()) {
-            if (connection == null) {
-                return;
-            }
-
+        checkConnection();
+        try {
             var statement = connection.createStatement();
             statement.executeUpdate(query);
         } catch (SQLException e) {
