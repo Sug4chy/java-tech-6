@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Properties;
 
 public class UserRepository {
@@ -38,10 +37,11 @@ public class UserRepository {
         }
     }
 
-    private <T> T executeQuery(String query, ResultHandler<T> handler) {
+    private <T> T executeQuery(String query, StatementPreparer preparer, ResultHandler<T> handler) {
         checkConnection();
-        try (Statement statement = connection.createStatement()) {
-            var result = statement.executeQuery(query);
+        try (var statement = connection.prepareStatement(query)) {
+            preparer.prepare(statement);
+            var result = statement.executeQuery();
             if (!result.next()) {
                 return null;
             }
@@ -53,17 +53,19 @@ public class UserRepository {
         return null;
     }
 
-    private void executeUpdate(String query) {
+    private void executeUpdate(String query, StatementPreparer preparer) {
         checkConnection();
-        try (var statement = connection.createStatement()) {
-            statement.executeUpdate(query);
+        try (var statement = connection.prepareStatement(query)) {
+            preparer.prepare(statement);
+            statement.executeUpdate();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public User getUserByLogin(String login) {
-        return executeQuery("select * from users u where u.login = '" + login + "'",
+        return executeQuery("select * from users u where u.login = ?",
+                statement -> statement.setString(1, login),
                 set -> new User(
                         set.getString("login"),
                         set.getString("password"),
@@ -72,7 +74,11 @@ public class UserRepository {
     }
 
     public void addUser(User user) {
-        executeUpdate("insert into users(login, password, email) values ('" + user.getLogin()
-                + "', '" + user.getPassword() + "', '" + user.getEmail() + "')");
+        executeUpdate("insert into users(login, password, email) values (?, ?, ?)",
+                statement -> {
+            statement.setString(1, user.getLogin());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getEmail());
+                });
     }
 }
